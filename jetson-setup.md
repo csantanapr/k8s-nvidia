@@ -104,10 +104,10 @@ git config --global user.email "your@email.com"
 ```
 
 ## VSCode
-You can use VSCode and connect to your raspberry pi. Then you can install extensions.
+You can use VSCode and connect to your device. Then you can install extensions.
 
-Select "Remote Explorer" from the left side menu tasks, then select your raspberry pi
+Select "Remote Explorer" from the left side menu tasks, then select your device
 
-Open the directory `~/` as workspace, open a new terminal, this will be a prompt in your raspberry pi
+Open the directory `~/` as workspace, open a new terminal, this will be a prompt in your device
 
 You can install extentions like "Amazon Q" and use the Free tier, This give you an AI assitance in VSCode

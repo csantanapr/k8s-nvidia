@@ -1,8 +1,14 @@
 ## CUDA
 
+## App CUDA to PATH
+```bash
+echo "export PATH=\$PATH:/usr/local/cuda/bin" >> $HOME/.bashrc
+source $HOME/.bashrc
+```
+
 ## Check version
 ```bash
-/usr/local/cuda/bin/nvcc --version
+nvcc --version
 ```
 expected output:
 ```
@@ -13,7 +19,7 @@ Cuda compilation tools, release 12.2, V12.2.140
 Build cuda_12.2.r12.2/compiler.33191640_0
 ```
 
-## Upgrade CUDA
+## Upgrade CUDA (Optional)
 https://developer.nvidia.com/cuda-downloads
 
 

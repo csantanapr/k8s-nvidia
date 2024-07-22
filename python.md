@@ -31,7 +31,7 @@ eval "$(/home/ubuntu/miniconda3/bin/conda shell.YOUR_SHELL_NAME hook)"
 
 To install conda's shell functions for easier access, first activate, then:
 ```bash
-conda init
+$HOME/miniconda3/bin/conda init
 ```
 
 To create an environment
