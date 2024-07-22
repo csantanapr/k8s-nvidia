@@ -4,11 +4,11 @@ Following instructions from https://www.digitalocean.com/community/tutorials/how
 
 ```bash
 sudo apt update
-sudo apt install apt-transport-https ca-certificates curl software-properties-common
+sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu focal stable"
 apt-cache policy docker-ce
-sudo apt install docker-ce
+sudo apt install docker-ce -y
 sudo systemctl status docker
 ```
 
@@ -103,9 +103,37 @@ version = 1
 ```
 
 ## Sample Workload
-Ref: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/sample-workload.html
+Ref: https://www.reddit.com/r/docker/comments/unlqlr/use_cuda_within_a_docker_container/
 
-Run a sample CUDA container:
+Download the runtime CUDA container:
 ```bash
-sudo docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi
+docker pull nvidia/cuda:12.2.2-runtime-ubuntu20.04
+```
+
+Run and bash into it
+```bash
+docker run --rm --runtime=nvidia --gpus all -it nvidia/cuda:12.2.2-runtime-ubuntu20.04 bash
+```
+
+Run the following code
+```bash
+
+apt update
+apt install wget -y
+
+# install miniconda
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh
+bash Miniconda3-latest-Linux-aarch64.sh -b -p /opt/miniconda
+
+/opt/miniconda/bin/conda init
+
+exec bash
+conda create -n pytorch
+conda activate pytorch
+
+conda install pytorch torchvision torchaudio cudatoolkit -c pytorch
+conda install nvidia/label/cuda-12.2.2::cuda-toolkit -c pytorch
+
+# check if cuda is available
+python -m torch.utils.collect_env
 ```

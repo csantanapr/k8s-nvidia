@@ -17,7 +17,7 @@ The choice ultimately depends on whether you need to manage multiple Python vers
 ## Conda
 ```bash
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh
-bash Miniconda3-latest-Linux-aarch64.sh
+bash Miniconda3-latest-Linux-aarch64.sh -b
 ```
 
 conda config --set auto_activate_base false

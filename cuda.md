@@ -82,3 +82,29 @@ Result = PASS
 
 Fine Tune:
 https://wiki.seeedstudio.com/Finetune_LLM_on_Jetson/
+
+Test pytorch cuda
+https://developer.download.nvidia.com/compute/redist/jp/v60/pytorch/
+
+wget https://developer.download.nvidia.com/compute/redist/jp/v60/pytorch/torch-2.4.0a0+07cecf4168.nv24.05.14710581-cp310-cp310-linux_aarch64.whl -O torch-2.4.0a0+07cecf4168.nv24.05.14710581-cp310-cp310-linux_aarch64.whl
+
+pip install torch-2.4.0a0+f70bd71a48.nv24.06.15634931-cp310-cp310-linux_aarch64.whl
+
+```python
+import torch
+
+print("PyTorch version:", torch.__version__)
+
+# Check if CUDA is available
+print("CUDA is available:", torch.cuda.is_available())
+
+# Get the number of available GPUs
+print("Number of GPUs:", torch.cuda.device_count())
+
+# Get the current CUDA device
+print("Current CUDA device:", torch.cuda.current_device())
+
+# Get the name of the current CUDA device
+print("Name of the current CUDA device:", torch.cuda.get_device_name(torch.cuda.current_device()))
+
+```
