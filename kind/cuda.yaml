@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cuda-samples
+spec:
+  restartPolicy: OnFailure
+  containers:
+  - name: cuda-samples
+    image: "dustynv/cuda:12.2-samples-r36.2.0"
+    # sleep
+    command: ["/opt/cuda-samples/bin/aarch64/linux/release/deviceQuery"]
+    # resources:
+    #   limits:
+    #     nvidia.com/gpu: 1

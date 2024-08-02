@@ -30,6 +30,11 @@ curl ollama.default.127.0.0.1.sslip.io/api/generate -d '{
   "prompt":"generate terraform to create eks cluster with everything"
 }'
 
+curl http://localhost:11434/api/generate -d '{
+  "model": "llama3-groq-tool-use:8b",
+  "prompt":"generate terraform to create eks cluster with everything"
+}'
+
 docker run -it --rm --network=host --add-host=host.docker.internal:host-gateway ghcr.io/open-webui/open-webui:main
 
 

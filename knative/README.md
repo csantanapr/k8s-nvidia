@@ -8,7 +8,7 @@ Set at the top of the file `accept-nvidia-visible-devices-as-volume-mounts = tru
 
 ```bash
 # Create kind cluster name knative
-kind create cluster --name knative --config kind.yaml
+kind create cluster --name knative --config ../kind/kind.yaml
 ```
 
 ```bash
