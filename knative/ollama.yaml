@@ -1,0 +1,33 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: ollama
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/min-scale: "1"
+    spec:
+      containerConcurrency: 1
+      containers:
+      - command:
+        - ollama
+        args:
+        - serve
+        image: dustynv/ollama:r36.2.0
+        ports:
+        - containerPort: 11434
+        volumeMounts:
+          - mountPath: /data
+            name: myvolume
+            readOnly: false
+        # request nvidia gpu
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+      volumes:
+      - name: myvolume
+        persistentVolumeClaim:
+          claimName: ollama-pvc
+
