@@ -65,6 +65,13 @@ remove taint
 kubectl taint nodes jetson node-role.kubernetes.io/control-plane:NoSchedule-
 ```
 
+aliases
+```bash
+alias log-kubelet="sudo journalctl -u kubelet -f"
+alias log-containerd="sudo journalctl -u containerd -f"
+```
+
+
 References:
 - https://forums.developer.nvidia.com/t/jetpack-6-3-containerd-and-kubernetes/296483/13
 - https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
