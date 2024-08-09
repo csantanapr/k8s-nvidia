@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ollama
+  name: ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      containers:
+      - name: ollama
+        image: dustynv/ollama:r36.2.0
+        command:
+        - ollama
+        args:
+        - serve
+        ports:
+        - containerPort: 11434
+        volumeMounts:
+          - mountPath: /data
+            name: myvolume
+            readOnly: false
+      volumes:
+      - name: myvolume
+        persistentVolumeClaim:
+          claimName: ollama-pvc
