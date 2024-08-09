@@ -43,14 +43,16 @@ Edit containerd and make sure SystemdCgroup is `true`
   SystemdCgroup = true
 ```
 
-```
-kubeadm init --pod-network-cidr=10.244.0.0/16
+```bash
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16
 ```
 
+
+
 ```bash
-  mkdir -p $HOME/.kube
-  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
 Apply flannel to the cluster
@@ -72,7 +74,44 @@ alias log-containerd="sudo journalctl -u containerd -f"
 ```
 
 
+remove label
+```bash
+kubectl label node jetson node.kubernetes.io/exclude-from-external-load-balancers-
+```
+
+```bash
+helm repo add metallb https://metallb.github.io/metallb
+helm install metallb metallb/metallb --namespace metallb-system --create-namespace
+```
+
+```bash
+kubectl metal-lb-pool.yaml
+```
+
+
 References:
 - https://forums.developer.nvidia.com/t/jetpack-6-3-containerd-and-kubernetes/296483/13
 - https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
 - https://github.com/vincent51689453/Kubernetes-Jetson-GPU-Clusters/tree/master
+
+### C. Common Issue
+1) ***ERROR "no such files -> /run/flannel/subnet.env"***
+Solu: copy this subnet.env file from master to all slaves which do not have this file
+
+2) ***Error "cni0" already has an IP address different from 10.244.1.1/24***
+Solu:
+**Inside Slave**
+```
+$ sudo ifconfig  cni0 down
+$ sudo brctl delbr cni0
+$ sudo ip link delete flannel.1
+$ kubeadm reset
+$ # run the kubeadm init  or join
+
+```
+
+
+3) ***DNS Issue: you can ping through ip address but not domain name. You are failed to perform apt-get update inside container***
+```
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
+where 8.8.8.8 should be 158.132.14.1 in my case
