@@ -1,0 +1,791 @@
+---
+# Source: nvidia-device-plugin/charts/nfd/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: node-feature-discovery
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nfd-0.15.3
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "v0.15.3"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: nvidia-device-plugin/charts/nfd/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nvdp-node-feature-discovery-worker
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nfd-0.15.3
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "v0.15.3"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: nvidia-device-plugin/charts/nfd/templates/nfd-master-conf.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nvdp-node-feature-discovery-master-conf
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nfd-0.15.3
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "v0.15.3"
+    app.kubernetes.io/managed-by: Helm
+data:
+  nfd-master.conf: |-
+    extraLabelNs:
+    - nvidia.com
+---
+# Source: nvidia-device-plugin/charts/nfd/templates/nfd-topologyupdater-conf.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nvdp-node-feature-discovery-topology-updater-conf
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nfd-0.15.3
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "v0.15.3"
+    app.kubernetes.io/managed-by: Helm
+data:
+  nfd-topology-updater.conf: |-
+    null
+---
+# Source: nvidia-device-plugin/charts/nfd/templates/nfd-worker-conf.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nvdp-node-feature-discovery-worker-conf
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nfd-0.15.3
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "v0.15.3"
+    app.kubernetes.io/managed-by: Helm
+data:
+  nfd-worker.conf: |-
+    sources:
+      pci:
+        deviceClassWhitelist:
+        - "02"
+        - "03"
+        deviceLabelFields:
+        - vendor
+---
+# Source: nvidia-device-plugin/charts/nfd/templates/clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nvdp-node-feature-discovery
+  labels:
+    helm.sh/chart: nfd-0.15.3
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "v0.15.3"
+    app.kubernetes.io/managed-by: Helm
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - nodes/status
+  verbs:
+  - get
+  - patch
+  - update
+  - list
+- apiGroups:
+  - nfd.k8s-sigs.io
+  resources:
+  - nodefeatures
+  - nodefeaturerules
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  resourceNames:
+  - "nfd-master.nfd.kubernetes.io"
+  verbs:
+  - get
+  - update
+---
+# Source: nvidia-device-plugin/charts/nfd/templates/clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nvdp-node-feature-discovery
+  labels:
+    helm.sh/chart: nfd-0.15.3
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "v0.15.3"
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nvdp-node-feature-discovery
+subjects:
+- kind: ServiceAccount
+  name: node-feature-discovery
+  namespace: nvidia-device-plugin
+---
+# Source: nvidia-device-plugin/charts/nfd/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: nvdp-node-feature-discovery-worker
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nfd-0.15.3
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "v0.15.3"
+    app.kubernetes.io/managed-by: Helm
+rules:
+- apiGroups:
+  - nfd.k8s-sigs.io
+  resources:
+  - nodefeatures
+  verbs:
+  - create
+  - get
+  - update
+---
+# Source: nvidia-device-plugin/charts/nfd/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: nvdp-node-feature-discovery-worker
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nfd-0.15.3
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "v0.15.3"
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: nvdp-node-feature-discovery-worker
+subjects:
+- kind: ServiceAccount
+  name: nvdp-node-feature-discovery-worker
+  namespace: nvidia-device-plugin
+---
+# Source: nvidia-device-plugin/charts/nfd/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nvdp-node-feature-discovery-master
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nfd-0.15.3
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "v0.15.3"
+    app.kubernetes.io/managed-by: Helm
+    role: master
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+  selector:
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    role: master
+---
+# Source: nvidia-device-plugin/charts/nfd/templates/worker.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name:  nvdp-node-feature-discovery-worker
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nfd-0.15.3
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "v0.15.3"
+    app.kubernetes.io/managed-by: Helm
+    role: worker
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: node-feature-discovery
+      app.kubernetes.io/instance: nvdp
+      role: worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: node-feature-discovery
+        app.kubernetes.io/instance: nvdp
+        role: worker
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      serviceAccountName: nvdp-node-feature-discovery-worker
+      securityContext:
+        {}
+      containers:
+      - name: worker
+        securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+        image: "registry.k8s.io/nfd/node-feature-discovery:v0.15.3"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+        resources:
+            {}
+        command:
+        - "nfd-worker"
+        args:
+        - "-server=nvdp-node-feature-discovery-master:8080"
+        - "-enable-nodefeature-api=false"
+        - "-metrics=8081"
+        ports:
+          - name: metrics
+            containerPort: 8081
+        volumeMounts:
+        - name: host-boot
+          mountPath: "/host-boot"
+          readOnly: true
+        - name: host-os-release
+          mountPath: "/host-etc/os-release"
+          readOnly: true
+        - name: host-sys
+          mountPath: "/host-sys"
+          readOnly: true
+        - name: host-usr-lib
+          mountPath: "/host-usr/lib"
+          readOnly: true
+        - name: host-lib
+          mountPath: "/host-lib"
+          readOnly: true
+        - name: source-d
+          mountPath: "/etc/kubernetes/node-feature-discovery/source.d/"
+          readOnly: true
+        - name: features-d
+          mountPath: "/etc/kubernetes/node-feature-discovery/features.d/"
+          readOnly: true
+        - name: nfd-worker-conf
+          mountPath: "/etc/kubernetes/node-feature-discovery"
+          readOnly: true
+      volumes:
+        - name: host-boot
+          hostPath:
+            path: "/boot"
+        - name: host-os-release
+          hostPath:
+            path: "/etc/os-release"
+        - name: host-sys
+          hostPath:
+            path: "/sys"
+        - name: host-usr-lib
+          hostPath:
+            path: "/usr/lib"
+        - name: host-lib
+          hostPath:
+            path: "/lib"
+        - name: source-d
+          hostPath:
+            path: "/etc/kubernetes/node-feature-discovery/source.d/"
+        - name: features-d
+          hostPath:
+            path: "/etc/kubernetes/node-feature-discovery/features.d/"
+        - name: nfd-worker-conf
+          configMap:
+            name: nvdp-node-feature-discovery-worker-conf
+            items:
+              - key: nfd-worker.conf
+                path: nfd-worker.conf
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Equal
+          value: ""
+        - effect: NoSchedule
+          key: nvidia.com/gpu
+          operator: Equal
+          value: present
+---
+# Source: nvidia-device-plugin/templates/daemonset-device-plugin.yml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nvdp-nvidia-device-plugin
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nvidia-device-plugin-0.17.1
+    app.kubernetes.io/name: nvidia-device-plugin
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "0.17.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nvidia-device-plugin
+      app.kubernetes.io/instance: nvdp
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nvidia-device-plugin
+        app.kubernetes.io/instance: nvdp
+      annotations:
+        {}
+    spec:
+      priorityClassName: system-node-critical
+      securityContext:
+        {}
+      containers:
+      - image: nvcr.io/nvidia/k8s-device-plugin:v0.17.1
+        imagePullPolicy: IfNotPresent
+        name: nvidia-device-plugin-ctr
+        command: ["nvidia-device-plugin"]
+        env:
+          - name: MPS_ROOT
+            value: /run/nvidia/mps
+          - name: NVIDIA_VISIBLE_DEVICES
+            value: all
+          - name: NVIDIA_DRIVER_CAPABILITIES
+            value: compute,utility
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+          - name: device-plugin
+            mountPath: /var/lib/kubelet/device-plugins
+          # The MPS /dev/shm is needed to allow for MPS daemon health-checking.
+          - name: mps-shm
+            mountPath: /dev/shm
+          - name: mps-root
+            mountPath: /mps
+          - name: cdi-root
+            mountPath: /var/run/cdi
+      volumes:
+        - name: device-plugin
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
+        - name: mps-root
+          hostPath:
+            path: /run/nvidia/mps
+            type: DirectoryOrCreate
+        - name: mps-shm
+          hostPath:
+            path: /run/nvidia/mps/shm
+        - name: cdi-root
+          hostPath:
+            path: /var/run/cdi
+            type: DirectoryOrCreate
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: feature.node.kubernetes.io/pci-10de.present
+                operator: In
+                values:
+                - "true"
+            - matchExpressions:
+              - key: feature.node.kubernetes.io/cpu-model.vendor_id
+                operator: In
+                values:
+                - NVIDIA
+            - matchExpressions:
+              - key: nvidia.com/gpu.present
+                operator: In
+                values:
+                - "true"
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: nvidia.com/gpu
+          operator: Exists
+---
+# Source: nvidia-device-plugin/templates/daemonset-gfd.yml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nvdp-nvidia-device-plugin-gpu-feature-discovery
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nvidia-device-plugin-0.17.1
+    app.kubernetes.io/name: nvidia-device-plugin
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "0.17.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nvidia-device-plugin
+      app.kubernetes.io/instance: nvdp
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nvidia-device-plugin
+        app.kubernetes.io/instance: nvdp
+      annotations:
+        {}
+    spec:
+      priorityClassName: system-node-critical
+      securityContext:
+        {}
+      initContainers:
+      containers:
+      - image: nvcr.io/nvidia/k8s-device-plugin:v0.17.1
+        imagePullPolicy: IfNotPresent
+        name: gpu-feature-discovery-ctr
+        command: ["gpu-feature-discovery"]
+        env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: GFD_USE_NODE_FEATURE_API
+            value: "false"
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: output-dir
+            mountPath: "/etc/kubernetes/node-feature-discovery/features.d"
+          - name: host-sys
+            mountPath: "/sys"
+          - name: config
+            mountPath: /config
+      volumes:
+        - name: output-dir
+          hostPath:
+            path: "/etc/kubernetes/node-feature-discovery/features.d"
+        - name: host-sys
+          hostPath:
+            path: "/sys"
+        - name: driver-root
+          hostPath:
+            path: "/"
+            type: Directory
+        - name: config
+          emptyDir: {}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: feature.node.kubernetes.io/pci-10de.present
+                operator: In
+                values:
+                - "true"
+            - matchExpressions:
+              - key: feature.node.kubernetes.io/cpu-model.vendor_id
+                operator: In
+                values:
+                - NVIDIA
+            - matchExpressions:
+              - key: nvidia.com/gpu.present
+                operator: In
+                values:
+                - "true"
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: nvidia.com/gpu
+          operator: Exists
+---
+# Source: nvidia-device-plugin/templates/daemonset-mps-control-daemon.yml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nvdp-nvidia-device-plugin-mps-control-daemon
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nvidia-device-plugin-0.17.1
+    app.kubernetes.io/name: nvidia-device-plugin
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "0.17.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nvidia-device-plugin
+      app.kubernetes.io/instance: nvdp
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nvidia-device-plugin
+        app.kubernetes.io/instance: nvdp
+      annotations:
+        {}
+    spec:
+      priorityClassName: system-node-critical
+      securityContext:
+        {}
+      initContainers:
+      - image: nvcr.io/nvidia/k8s-device-plugin:v0.17.1
+        name: mps-control-daemon-mounts
+        command: [mps-control-daemon, mount-shm]
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: mps-root
+          mountPath: /mps
+          mountPropagation: Bidirectional
+      containers:
+        - image: nvcr.io/nvidia/k8s-device-plugin:v0.17.1
+          imagePullPolicy: IfNotPresent
+          name: mps-control-daemon-ctr
+          command: [mps-control-daemon]
+          env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          - name: NVIDIA_VISIBLE_DEVICES
+            value: all
+          - name: NVIDIA_DRIVER_CAPABILITIES
+            value: compute,utility
+          securityContext:
+            privileged: true
+          volumeMounts:
+          - name: mps-shm
+            mountPath: /dev/shm
+          - name: mps-root
+            mountPath: /mps
+      volumes:
+      - name: mps-root
+        hostPath:
+          path: /run/nvidia/mps
+          type: DirectoryOrCreate
+      - name: mps-shm
+        hostPath:
+          path: /run/nvidia/mps/shm
+      nodeSelector:
+        # We only deploy this pod if the following sharing label is applied.
+        nvidia.com/mps.capable: "true"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: feature.node.kubernetes.io/pci-10de.present
+                operator: In
+                values:
+                - "true"
+            - matchExpressions:
+              - key: feature.node.kubernetes.io/cpu-model.vendor_id
+                operator: In
+                values:
+                - NVIDIA
+            - matchExpressions:
+              - key: nvidia.com/gpu.present
+                operator: In
+                values:
+                - "true"
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: nvidia.com/gpu
+          operator: Exists
+---
+# Source: nvidia-device-plugin/charts/nfd/templates/master.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  nvdp-node-feature-discovery-master
+  namespace: nvidia-device-plugin
+  labels:
+    helm.sh/chart: nfd-0.15.3
+    app.kubernetes.io/name: node-feature-discovery
+    app.kubernetes.io/instance: nvdp
+    app.kubernetes.io/version: "v0.15.3"
+    app.kubernetes.io/managed-by: Helm
+    role: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: node-feature-discovery
+      app.kubernetes.io/instance: nvdp
+      role: master
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: node-feature-discovery
+        app.kubernetes.io/instance: nvdp
+        role: master
+    spec:
+      serviceAccountName: node-feature-discovery
+      enableServiceLinks: false
+      securityContext:
+        {}
+      containers:
+        - name: master
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          image: "registry.k8s.io/nfd/node-feature-discovery:v0.15.3"
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            grpc:
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            grpc:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 10
+          ports:
+          - containerPort: 8080
+            name: grpc
+          - containerPort: 8081
+            name: metrics
+          env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          command:
+            - "nfd-master"
+          resources:
+            {}
+          args:
+            - "-port=8080"
+            - "-enable-nodefeature-api=false"
+            ## By default, disable crd controller for other than the default instances
+            - "-crd-controller=true"
+            - "-metrics=8081"
+          volumeMounts:
+            - name: nfd-master-conf
+              mountPath: "/etc/kubernetes/node-feature-discovery"
+              readOnly: true
+      volumes:
+        - name: nfd-master-conf
+          configMap:
+            name: nvdp-node-feature-discovery-master-conf
+            items:
+              - key: nfd-master.conf
+                path: nfd-master.conf
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: In
+                values:
+                - ""
+            weight: 1
+          - preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: In
+                values:
+                - ""
+            weight: 1
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Equal
+          value: ""
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Equal
+          value: ""
+---
+# Source: nvidia-device-plugin/templates/daemonset-device-plugin.yml
+# Copyright (c) 2019, NVIDIA CORPORATION.  All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: nvidia-device-plugin/templates/daemonset-gfd.yml
+# Copyright (c) 2019, NVIDIA CORPORATION.  All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Source: nvidia-device-plugin/templates/daemonset-mps-control-daemon.yml
+# Copyright 2024 NVIDIA CORPORATION
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.

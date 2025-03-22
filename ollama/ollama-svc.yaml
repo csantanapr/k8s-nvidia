@@ -11,4 +11,18 @@ spec:
     targetPort: 11434
   selector:
     app: ollama
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ollama-2
+  name: ollama-2
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 11434
+  selector:
+    app: ollama-2
 

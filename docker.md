@@ -88,6 +88,7 @@ version = 1
   [plugins.cri]
 
     [plugins.cri.containerd]
+      default_runtime_name = "nvidia"
 
       [plugins.cri.containerd.runtimes]
 

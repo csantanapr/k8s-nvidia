@@ -24,3 +24,30 @@ spec:
         env:
         - name: OLLAMA_BASE_URL
           value: "http://ollama"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ollama-ui-2
+  name: ollama-ui-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama-ui-2
+  template:
+    metadata:
+      labels:
+        app: ollama-ui-2
+    spec:
+      dnsPolicy: ClusterFirst
+      containers:
+      - name: ollama-ui
+        image: ghcr.io/open-webui/open-webui:main
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: OLLAMA_BASE_URL
+          value: "http://ollama-2"

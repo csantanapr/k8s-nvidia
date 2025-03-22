@@ -12,4 +12,18 @@ spec:
   selector:
     app: ollama-ui
   type: LoadBalancer
-
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ollama-ui-2
+  name: ollama-ui-2
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: ollama-ui-2
+  type: LoadBalancer
